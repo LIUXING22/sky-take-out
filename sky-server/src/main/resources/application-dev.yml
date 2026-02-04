@@ -11,3 +11,10 @@ sky:
     access-key-id: LTAI5tDcNTf97m7DUVmrFLKt
     access-key-secret: qdzezCerfYAYyPMiVJy6gAIXYrm9d0
     bucket-name: wenpeibiao
+  redis:
+    host: localhost
+    port: 6379
+    database: 10
+  wechat:
+    appid: wx35092071debdb3ae
+    secret: c2b7d71e6b4b6bc48e01206d261f7041
