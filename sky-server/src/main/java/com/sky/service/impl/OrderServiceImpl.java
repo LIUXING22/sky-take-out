@@ -22,6 +22,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +56,8 @@ public class OrderServiceImpl implements OrderService {
     private String shopAddress;
     @Value("${sky.baidu.ak}")
     private String ak;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
@@ -161,8 +164,6 @@ public class OrderServiceImpl implements OrderService {
         Long orderNumber = Long.valueOf(ordersPaymentDTO.getOrderNumber());
         orderMapper.updateStatus(OrderStatus,OrderPaidStatus,check_out_time,orderNumber);
 
-
-
         return vo;
     }
 
@@ -185,6 +186,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+        //通过Websocket推送消息 type orderId content
+        Map map=new HashMap();
+        map.put("type",1);
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号"+outTradeNo);
+
+        String json = JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
 
@@ -587,5 +596,7 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException("超出配送范围");
         }
     }
+
+
 
 }
